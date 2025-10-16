@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>CursoTest - Plataforma de Cursos</title>
+  <style>
+    :root {
+      --roxo: #6a0dad;
+      --roxo-claro: #f0e6ff;
+      --cinza-claro: #f8f8f8;
+      --cinza: #ccc;
+      --sombra: 0 4px 8px rgba(0, 0, 0, 0.1);
+      --radius: 8px;
+      --contraste-bg: #000;
+      --contraste-texto: #fff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--cinza-claro);
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .contraste {
+      background-color: var(--contraste-bg) !important;
+      color: var(--contraste-texto) !important;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 30px;
+      background: white;
+      border-radius: var(--radius);
+      box-shadow: var(--sombra);
+    }
+
+    h1, h2, h3 {
+      color: var(--roxo);
+    }
+
+    label {
+      margin-top: 15px;
+      display: block;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--cinza);
+      border-radius: var(--radius);
+      margin-top: 5px;
+      resize: none;
+      font-family: inherit;
+      font-size: 1em;
+    }
+
+    textarea {
+      height: 100px;
+    }
+
+    button {
+      background-color: var(--roxo);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 15px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #4b0082;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .mensagem {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: var(--radius);
+    }
+
+    .sucesso {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .erro {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    /* Estilo dos cards de cursos */
+    #listaCursos, #listaCursosSistema {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .curso-card {
+      background: var(--roxo-claro);
+      border-radius: var(--radius);
+      padding: 15px;
+      box-shadow: var(--sombra);
+      width: calc(50% - 15px);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 120px;
+    }
+
+    .curso-titulo {
+      font-weight: bold;
+      color: var(--roxo);
+      font-size: 1.1em;
+      margin-bottom: 10px;
+    }
+
+    .curso-botoes button {
+      width: 48%;
+      margin-right: 4%;
+      font-weight: bold;
+      font-size: 0.9em;
+    }
+
+    .curso-botoes button:last-child {
+      margin-right: 0;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container" id="mainContainer">
+    <h1>CursoTest</h1>
+
+    <button onclick="alternarContraste()">Ativar/Desativar Contraste</button>
+
+    <div id="loginForm">
+      <label for="login">Login:</label>
+      <input type="text" id="login" placeholder="Digite seu login" />
+
+      <label for="senha">Senha:</label>
+      <input type="password" id="senha" placeholder="Digite sua senha" />
+
+      <button onclick="fazerLogin()">Entrar</button>
+      <div id="erroLogin" class="mensagem erro hidden"></div>
+
+      <h3>Buscar Cursos</h3>
+      <input
+        type="text"
+        id="campoBusca"
+        placeholder="Digite o nome do curso"
+        oninput="filtrarCursos()"
+      />
+      <div id="listaCursos"></div>
+    </div>
+
+    <div id="sistema" class="hidden">
+      <h2>Bem-vindo, <span id="usuarioNome"></span>!</h2>
+      <button onclick="fazerLogout()">Sair</button>
+
+      <h3>Buscar Cursos</h3>
+      <input
+        type="text"
+        id="campoBuscaSistema"
+        placeholder="Digite o nome do curso"
+        oninput="filtrarCursosSistema()"
+      />
+      <div id="listaCursosSistema"></div>
+
+      <h3>Cursos Matriculados</h3>
+      <textarea id="caixaMatriculados" readonly></textarea>
+
+      <h3>Avaliar Curso</h3>
+      <label for="cursoAvaliar">Curso:</label>
+      <select id="cursoAvaliar"></select>
+
+      <label for="nota">Nota (1 a 5):</label>
+      <input type="number" id="nota" min="1" max="5" />
+
+      <button onclick="avaliarCurso()">Enviar Avaliação</button>
+      <div id="avaliacoes"></div>
+    </div>
+  </div>
+
+  <script>
+    const usuario = { login: "testador", senha: "teste" };
+    const cursos = [
+      "HTML Básico",
+      "Java Avançado",
+      "JavaScript Intermediário",
+      "Python para Iniciantes",
+      "Guia QA Intermediário",
+    ];
+    let cursosConcluidos = [];
+    let avaliacoes = [];
+    let favoritos = new Set();
+    let inatividadeTimer;
+
+    function salvarMatriculas() {
+      localStorage.setItem("matriculas", JSON.stringify(cursosConcluidos));
+    }
+
+    function carregarMatriculas() {
+      const data = localStorage.getItem("matriculas");
+      if (data) {
+        cursosConcluidos = JSON.parse(data);
+      } else {
+        cursosConcluidos = [];
+      }
+    }
+
+    function fazerLogin() {
+      const login = document.getElementById("login").value;
+      const senha = document.getElementById("senha").value;
+      const erro = document.getElementById("erroLogin");
+
+      if (login === usuario.login && senha === usuario.senha) {
+        document.getElementById("loginForm").classList.add("hidden");
+        document.getElementById("sistema").classList.remove("hidden");
+        document.getElementById("usuarioNome").textContent = login;
+        carregarMatriculas();
+        atualizarCaixaMatriculados();
+        atualizarAvaliacoes();
+        filtrarCursosSistema();
+        iniciarTimerInatividade();
+        erro.classList.add("hidden");
+      } else {
+        erro.textContent = "Login ou senha incorretos.";
+        erro.classList.remove("hidden");
+      }
+    }
+
+    function fazerLogout() {
+      if (confirm("Deseja realmente sair?")) {
+        salvarMatriculas();
+        document.getElementById("sistema").classList.add("hidden");
+        document.getElementById("loginForm").classList.remove("hidden");
+        document.getElementById("login").value = "";
+        document.getElementById("senha").value = "";
+        clearTimeout(inatividadeTimer);
+        limparSistema();
+        filtrarCursos();
+      }
+    }
+
+    function filtrarCursos() {
+      const textoBusca = document.getElementById("campoBusca").value;
+      const container = document.getElementById("listaCursos");
+      container.innerHTML = "";
+
+      let cursosFiltrados;
+      if (textoBusca === "") {
+        cursosFiltrados = cursos;
+      } else {
+        cursosFiltrados = cursos.filter((curso) => curso === textoBusca);
+      }
+
+      cursosFiltrados.forEach((curso) => {
+        const card = criarCardCurso(curso, false);
+        container.appendChild(card);
+      });
+    }
+
+    function filtrarCursosSistema() {
+      const textoBusca = document.getElementById("campoBuscaSistema").value;
+      const container = document.getElementById("listaCursosSistema");
+      container.innerHTML = "";
+
+      let cursosFiltrados;
+      if (textoBusca === "") {
+        cursosFiltrados = cursos;
+      } else {
+        cursosFiltrados = cursos.filter((curso) => curso === textoBusca);
+      }
+
+      cursosFiltrados.forEach((curso) => {
+        const card = criarCardCurso(curso, true);
+        container.appendChild(card);
+      });
+    }
+
+    function criarCardCurso(curso, noSistema) {
+      const card = document.createElement("div");
+      card.className = "curso-card";
+
+      const titulo = document.createElement("div");
+      titulo.className = "curso-titulo";
+      titulo.textContent = curso;
+
+      card.appendChild(titulo);
+
+      if (noSistema) {
+        const botoes = document.createElement("div");
+        botoes.className = "curso-botoes";
+
+        const btnFavorito = document.createElement("button");
+        btnFavorito.className = "favorito";
+        btnFavorito.textContent = favoritos.has(curso)
+          ? "★ Favoritado"
+          : "☆ Favoritar";
+        btnFavorito.onclick = () => {
+          if (favoritos.has(curso)) {
+            favoritos.delete(curso);
+          } else {
+            favoritos.add(curso);
+          }
+          filtrarCursosSistema();
+        };
+
+       
+        const btnMatricular = document.createElement("button");
+        btnMatricular.className = "matricular";
+        btnMatricular.textContent = "Matricular";
+        btnMatricular.onclick = () => {
+          cursosConcluidos.push(curso);
+          atualizarCaixaMatriculados();
+          atualizarAvaliacoes();
+          salvarMatriculas();
+          alert(`Você se matriculou no curso: ${curso}`);
+        };
+
+        botoes.appendChild(btnFavorito);
+        botoes.appendChild(btnMatricular);
+
+        card.appendChild(botoes);
+      }
+
+      return card;
+    }
+
+
+    function atualizarCaixaMatriculados() {
+      const caixa = document.getElementById("caixaMatriculados");
+      caixa.value = cursosConcluidos.join("\n");
+    }
+
+ function atualizarAvaliacoes() {
+  const select = document.getElementById("cursoAvaliar");
+  select.innerHTML = "";
+  cursos.forEach((curso) => {
+    const opt = document.createElement("option");
+    opt.value = curso;
+    opt.textContent = curso;
+    select.appendChild(opt);
+  });
+}
+
+    function avaliarCurso() {
+      const curso = document.getElementById("cursoAvaliar").value;
+      const nota = parseInt(document.getElementById("nota").value);
+      const output = document.getElementById("avaliacoes");
+
+      if (!curso || isNaN(nota) || nota < 1) {
+        alert("Selecione um curso e uma nota válida (maior ou igual a 1).");
+        return;
+      }
+      
+      avaliacoes.push({ curso, nota });
+      output.innerHTML = `<p>Você avaliou <strong>${curso}</strong> com nota <strong>${nota}</strong>/5.</p>`;
+      document.getElementById("nota").value = "";
+    }
+
+    function alternarContraste() {
+      document.body.classList.toggle("contraste");
+      document.getElementById("mainContainer").classList.toggle("contraste");
+    }
+
+    function iniciarTimerInatividade() {
+      document.onmousemove = document.onkeypress = () => {
+        clearTimeout(inatividadeTimer);
+        inatividadeTimer = setTimeout(() => {
+          alert("Você está inativo há um tempo. Deseja continuar?");
+        }, 60000);
+      };
+    }
+
+    function limparSistema() {
+      favoritos.clear();
+      avaliacoes = [];
+      document.getElementById("cursoAvaliar").innerHTML = "";
+      document.getElementById("avaliacoes").innerHTML = "";
+      document.getElementById("campoBuscaSistema").value = "";
+      document.getElementById("listaCursosSistema").innerHTML = "";
+      document.getElementById("caixaMatriculados").value = "";
+    }
+
+    filtrarCursos();
+  </script>
+</body>
+</html>

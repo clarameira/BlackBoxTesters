@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Apenas um Formulário</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #667eea, #764ba2);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 0 10px;
+      color: #fff;
+    }
+
+    header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    .imagem-topo {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      width: 320px;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 15px;
+      display: block;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    button {
+      background-color: #ff6b6b;
+      color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    
+    button:hover {
+      background-color: #ff4757;
+    }
+
+    #enviar {
+      position: relative;
+      top: 20px;
+      left: 120px;
+      width: 80px;
+      height: 40px;
+      bottom: -40px;
+      cursor: pointer;
+    }
+
+    .aviso {
+      text-align: center;
+      font-size: 13px;
+      margin-top: 10px;
+      color: #aa0000;
+    }
+
+    footer {
+      color: white;
+      font-size: 13px;
+      padding-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" class="imagem-topo" alt="ícone maluco">
+    <h1>Apenas um Formulário</h1>
+    <p>Encontre os bugs!</p>
+  </header>
+
+  <div class="container">
+    <form onsubmit="enviarFormulario(); return false;">
+      <label>Nome:</label>
+      <input type="number" placeholder="Digite seu nome"> 
+
+      <label>Email:</label>
+      <input type="text" placeholder="exemplo@email.com">
+
+      <label>Data de Nascimento:</label>
+      <input type="text" placeholder="DD/MM/AAAA"> 
+
+      <label>Quer virar um testador?</label>
+      <select>
+        <option>Sim</option> 
+        <option>Não</option>
+      </select>
+
+      <div class="aviso">Clique no botão, se conseguir...</div>
+      <button type="submit" id="enviar">Enviar</button> <!-- fora do lugar -->
+    </form>
+  </div>
+
+  <footer>
+    &copy; 2025 - Curso - Introdução ao Teste de Software
+  </footer>
+
+  <script>
+      function enviarFormulario() {
+          alert("Cadastro falhou: tente novamente mais tarde!");
+          console.log("Erro: sistema não cadastra ninguém de verdade.");
+        };
+    
+    let x = 0;
+    let y = 0;
+    const button = document.getElementById('enviar');
+
+    button.addEventListener("mouseenter", () =>{
+        x = Math.floor(Math.random() * 500);
+        y = Math.floor(Math.random() * -500);
+        console.log(x);
+        button.style.transform = `translate(${x}px, ${y}px)`;
+    });
+
+  </script>
+
+</body>
+</html>
