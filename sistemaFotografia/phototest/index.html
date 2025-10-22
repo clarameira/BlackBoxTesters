@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PhotoTest</title>
+  <style>
+    :root{--bg:#0f172a;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8;--glass:rgba(255,255,255,0.03)}
+    *{box-sizing:border-box;font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial}
+    body{margin:0;background:linear-gradient(180deg,#071025 0%, #071a2b 100%);color:#e6eef6;padding:24px}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+    h1{font-size:20px;margin:0}
+    .layout{display:grid;grid-template-columns:320px 1fr;gap:18px}
+    .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 20px rgba(2,6,23,0.6)}
+    label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    input,select,textarea{width:100%;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit}
+    button{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;color:#042027;cursor:pointer}
+    .small{font-size:13px;color:var(--muted)}
+    ul{list-style:none;padding:0;margin:0}
+    .list-item{display:flex;justify-content:space-between;gap:10px;padding:10px;border-radius:8px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);margin-bottom:8px}
+    .photos{display:flex;gap:8px;flex-wrap:wrap}
+    .photo-thumb{width:100px;height:70px;object-fit:cover;border-radius:6px}
+    .muted{color:var(--muted)}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}
+    footer{margin-top:18px;color:var(--muted);font-size:13px}
+    .danger{background:#ff8a8a;color:#2b0202}
+    .pill{padding:4px 8px;border-radius:999px;font-size:12px;background:rgba(255,255,255,0.03)}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .search{display:flex;gap:8px;margin-bottom:8px}
+    .hidden{display:none}
+    .preview{display:flex;gap:8px;align-items:center}
+    .meta{font-size:12px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>PhotoTest</h1>
+    <div class="small">Realize os testes <em>caixa preta</em></div>
+  </header>
+
+  <div class="layout">
+    <!-- left column: forms -->
+    <div>
+      <div class="card" id="client-card">
+        <h3>Cadastro</h3>
+        <form id="client-form">
+          <label>Nome
+            <input id="client-name" type="text" placeholder="Nome" required />
+          </label>
+          <label>Email
+            <input id="client-email" type="email" placeholder="cliente@exemplo.com" required />
+          </label>
+          <label>Data de Nascimento
+            <input id="client-birth" type="date" required />
+          </label>
+          <label>Telefone
+            <input id="client-phone" type="text" placeholder="(DDD) 99999-9090" required />
+          </label>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="btn-add-client" type="submit">Adicionar</button>
+            <button id="btn-clear-client" type="button" class="danger">Limpar</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:12px" id="prices-card">
+        <h3>Tabela de Preços</h3>
+        <table style="width:100%;font-size:13px;border-collapse:collapse">
+          <thead>
+            <tr style="color:var(--accent)">
+              <th style="text-align:left">Tipo</th>
+              <th>Base (R$)</th>
+              <th>Valor por Hora (R$)</th>
+              <th>Impressão (R$)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Individual</td><td>500</td><td>80</td><td>70</td></tr>
+            <tr><td>Casamento</td><td>800</td><td>200</td><td>90</td></tr>
+            <tr><td>Profissional</td><td>600</td><td>100</td><td>70</td></tr>
+            <tr><td>Família</td><td>200</td><td>90</td><td>55</td></tr>
+            <tr><td>Evento</td><td>300</td><td>120</td><td>30</td></tr>
+          </tbody>
+        </table>
+        <div class="small muted" style="margin-top:6px">Cálculo base = (valorTotal / valorHora * horasEscolhidas) * impressoes </div>
+      </div>
+
+      <div class="card" style="margin-top:12px" id="request-card">
+        <h3>Solicitar Ensaio</h3>
+        <form id="request-form">
+          <label>Cliente (email)
+            <input id="req-client-email" type="email" placeholder="cliente@exemplo.com" required />
+          </label>
+          <label>Tipo
+            <select id="req-type">
+              <option value="individual">Individual</option>
+              <option value="wedding">Casamento</option>
+              <option value="professional">Profissional</option>
+              <option value="family">Família</option>
+              <option value="event">Evento</option>
+            </select>
+          </label>
+          <div class="grid-2">
+            <label>Data
+              <input id="req-date" type="date" />
+            </label>
+            <label>Horas
+              <input id="req-hours" type="number" min="1" value="2" />
+            </label>
+          </div>
+          <label>Extras (impressões)
+            <input id="req-extra" type="number" min="0" value="0" />
+          </label>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="btn-add-request" type="submit">Solicitar</button>
+            <button id="btn-quote" type="button">Gerar Orçamento</button>
+          </div>
+          <div id="quote-result" class="small muted" style="margin-top:8px"></div>
+        </form>
+      </div>
+
+      <div class="card" style="margin-top:12px" id="upload-card">
+        <h3>Enviar imagens de referência</h3>
+        <input id="photo-files" type="file" multiple accept="image/*" />
+        <div class="preview" id="preview"></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="btn-upload">Adicionar ao Álbum</button>
+        </div>
+        <div class="small muted" style="margin-top:6px">Apenas você pode ver</div>
+      </div>
+
+      <div class="card" style="margin-top:12px" id="comment-card">
+        <h3>Comentários</h3>
+        <form id="comment-form">
+          <label>Autor
+            <input id="comment-author" type="text" placeholder="Seu nome" />
+          </label>
+          <label>Comentário
+            <textarea id="comment-text" rows="3" placeholder="Deixe um comentário" ></textarea>
+          </label>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="btn-add-comment" type="submit">Salvar</button>
+            <button id="btn-clear-comments" type="button" class="danger">Limpar todos</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- right column: lists / dashboard -->
+    <div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h3 style="margin:0">Dashboard</h3>
+          <div class="controls">
+            <input id="search" class="search" placeholder="Buscar cliente, email, tipo..." />
+            <select id="filter-type">
+              <option value="all">Todos</option>
+              <option value="individual">Individual</option>
+              <option value="wedding">Casamento</option>
+              <option value="professional">Profissional</option>
+              <option value="family">Família</option>
+              <option value="event">Evento</option>
+            </select>
+          </div>
+        </div>
+
+        <section>
+          <h4>Solicitações</h4>
+          <div id="requests-list"></div>
+        </section>
+
+        <section style="margin-top:12px">
+          <h4>Fotos</h4>
+          <div class="photos" id="photos-list"></div>
+        </section>
+
+        <section style="margin-top:12px">
+          <h4>Comentários</h4>
+          <div id="comments-list"></div>
+        </section>
+      </div>
+
+    </div>
+  </div>
+
+
+  <script>
+    // Simple helper: storage
+    const STORAGE_KEYS = { clients: 'pm_clients_v1', requests: 'pm_requests_v1', photos: 'pm_photos_v1', comments: 'pm_comments_v1' };
+
+    function read(key, fallback){
+      try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch(e){return fallback}
+    }
+    function write(key, val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+    // initial sample data
+    if(!read(STORAGE_KEYS.clients, null)){
+      write(STORAGE_KEYS.clients, [
+        { id: 1001, name: 'Ana Silva', email: 'ana@exemplo.com' },
+        { id: 1002, name: 'Bruno Costa', email: 'bruno@exemplo.com' }
+      ]);
+    }
+    if(!read(STORAGE_KEYS.requests, null)){
+      write(STORAGE_KEYS.requests, []);
+    }
+    if(!read(STORAGE_KEYS.photos, null)) write(STORAGE_KEYS.photos, []);
+    if(!read(STORAGE_KEYS.comments, null)) write(STORAGE_KEYS.comments, []);
+
+    // Pricing table
+    const PRICES = {
+      individual: { base: 500, perHour: 300, print: 70 },
+      wedding: { base: 800, perHour: 200, print: 90 },
+      profissional: { base: 600, perHour: 250, print: 70 },
+      family: { base: 200, perHour: 150, print: 55 },
+      event: { base: 300, perHour: 120, print: 30 }
+    };
+
+    // DOM refs
+    const clientForm = document.getElementById('client-form');
+    const clientName = document.getElementById('client-name');
+    const clientEmail = document.getElementById('client-email');
+    const btnClearClient = document.getElementById('btn-clear-client');
+
+    const reqForm = document.getElementById('request-form');
+    const reqEmail = document.getElementById('req-client-email');
+    const reqType = document.getElementById('req-type');
+    const reqDate = document.getElementById('req-date');
+    const reqHours = document.getElementById('req-hours');
+    const reqExtra = document.getElementById('req-extra');
+    const btnQuote = document.getElementById('btn-quote');
+    const quoteResult = document.getElementById('quote-result');
+
+    const photoFiles = document.getElementById('photo-files');
+    const btnUpload = document.getElementById('btn-upload');
+    const preview = document.getElementById('preview');
+
+    const commentForm = document.getElementById('comment-form');
+    const commentAuthor = document.getElementById('comment-author');
+    const commentText = document.getElementById('comment-text');
+    const btnClearComments = document.getElementById('btn-clear-comments');
+
+    const requestsList = document.getElementById('requests-list');
+    const photosList = document.getElementById('photos-list');
+    const commentsList = document.getElementById('comments-list');
+    const search = document.getElementById('search');
+    const filterType = document.getElementById('filter-type');
+
+    // Utilities
+    function genId(){ return Date.now() + Math.floor(Math.random()*999); }
+
+    // Load state
+    let clients = read(STORAGE_KEYS.clients, []);
+    let requests = read(STORAGE_KEYS.requests, []);
+    let photos = read(STORAGE_KEYS.photos, []);
+    let comments = read(STORAGE_KEYS.comments, []);
+
+    // Render functions
+    function renderClients(){ /* not shown on UI list, used for validation */ }
+
+    function renderRequests(){
+      requestsList.innerHTML = '';
+      const q = (search.value || '').trim();
+      const f = filterType.value;
+      let visible = requests.filter(r=>{
+        if(f!=='all' && r.type !== f) return false;
+        if(!q) return true;
+        const lq = q.toLowerCase();
+        // intentional bug: sometimes upper-case matching fails due to missing toLowerCase in one operand
+        return (r.clientEmail && r.clientEmail.toLowerCase().includes(lq)) || (r.type && r.type.includes(q));
+      });
+
+      if(visible.length===0) requestsList.innerHTML = '<div class="muted">Nenhuma solicitação</div>';
+
+      visible.forEach(r=>{
+        const el = document.createElement('div'); el.className='list-item';
+        el.innerHTML = `
+          <div>
+            <div><strong>${r.type}</strong> — <span class="meta">${r.clientName || r.clientEmail}</span></div>
+            <div class="small muted">${r.date} • ${r.hours}h • extras: ${r.extra || 0}</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <div class="pill">R$ ${calcPrice(r).toFixed(2)}</div>
+            <button data-id="${r.id}" class="btn-view">Ver</button>
+            <button data-id="${r.id}" class="btn-del danger">Excluir</button>
+          </div>
+        `;
+        requestsList.appendChild(el);
+      });
+    }
+
+    function renderPhotos(){
+      photosList.innerHTML='';
+      photos.forEach(p=>{
+        const img = document.createElement('img'); img.src = p.data; img.className='photo-thumb';
+        img.title = p.name;
+        photosList.appendChild(img);
+      });
+      if(photos.length===0) photosList.innerHTML='<div class="muted">Nenhuma foto</div>';
+    }
+
+    function renderComments(){
+      commentsList.innerHTML='';
+      if(comments.length===0) commentsList.innerHTML='<div class="muted">Sem comentários</div>';
+      comments.forEach(c=>{
+        const el = document.createElement('div'); el.className='list-item';
+        el.innerHTML = `<div><strong>${c.author||'Anônimo'}</strong><div class="small muted">${c.text}</div></div><div><button data-id="${c.id}" class="btn-del-comment danger">Excluir</button></div>`;
+        commentsList.appendChild(el);
+      });
+    }
+
+    // Core operations
+    function addClient(e){ e.preventDefault(); const name=clientName.value.trim(); const email=clientEmail.value.trim().toLowerCase(); if(!name||!email){alert('Preencha nome e email');return}
+      if(clients.find(c=>c.email===email)) { alert('Cliente já cadastrado'); return }
+      const newClient = { id: genId(), name, email };
+      clients.push(newClient); write(STORAGE_KEYS.clients, clients); clientName.value=''; clientEmail.value=''; renderRequests();
+    }
+
+    function addRequest(e){ e && e.preventDefault(); const email = reqEmail.value.trim().toLowerCase(); const client = clients.find(c=>c.email===email);
+      const date = reqDate.value; const type = reqType.value; const hours = parseInt(reqHours.value || '0',10); const extra = parseInt(reqExtra.value||'0',10);
+      // date validation: intentional subtle bug allowing past dates in some locales
+      if(!email) return alert('Informe o email do cliente');
+      if(!client) return alert('Cliente não encontrado');
+      if(!date) return alert('Informe a data');
+      // allow past dates due to timezone bug
+      const newReq = { id: genId(), clientEmail: email, clientName: client.name, date, type, hours, extra };
+      requests.push(newReq); write(STORAGE_KEYS.requests, requests); renderRequests();
+      alert('Solicitação criada');
+    }
+
+    function calcPrice(r){
+      const cfg = PRICES[r.type] || PRICES.portrait;
+      // intentional bug: sometimes extra prints are ignored (if extra is 0 it's fine)
+      const price = cfg.base + (r.hours * cfg.perHour);
+      if(r.extra) {
+        // bug: uses cfg.print but misses multiplying by r.extra in some runs — simulate nondeterminism
+        if(Math.random()<0.7) return price + (cfg.print * r.extra);
+        return price; // BUG PATH
+      }
+      return price;
+    }
+
+    function genQuote(){
+      const email = reqEmail.value.trim().toLowerCase(); const client = clients.find(c=>c.email===email);
+      const type = reqType.value; const hours = parseInt(reqHours.value||'0',10); const extra = parseInt(reqExtra.value||'0',10);
+      if(!client) { quoteResult.textContent='Cliente não encontrado'; return }
+      const fakeReq = { type, hours, extra };
+      const price = calcPrice(fakeReq);
+      quoteResult.textContent = `Valor estimado: R$ ${price.toFixed(2)}`;
+    }
+
+    function handleDeleteRequest(id){
+      // intentional off-by-one bug: use findIndex by converting id to number incorrectly sometimes
+      const idx = requests.findIndex(r=> r.id == id - 0 );
+      if(idx>-1){ requests.splice(idx,1); write(STORAGE_KEYS.requests, requests); renderRequests(); }
+      else alert('Falha ao excluir: não encontrado');
+    }
+
+    // photo handling (base64 in localStorage)
+    photoFiles.addEventListener('change', e=>{
+      preview.innerHTML='';
+      const list = Array.from(e.target.files || []);
+      // intended upload limit: 5
+      if(list.length > 5){ alert('Máx 5 arquivos por vez'); }
+      list.slice(0,5).forEach(file=>{
+        const fr = new FileReader(); fr.onload = ()=>{
+          const img = document.createElement('img'); img.src = fr.result; img.className='photo-thumb'; preview.appendChild(img);
+        }; fr.readAsDataURL(file);
+      });
+    });
+
+    btnUpload.addEventListener('click', ()=>{
+      const imgs = preview.querySelectorAll('img');
+      if(imgs.length===0){ alert('Nenhuma foto para enviar'); return }
+      // intentional bug: sometimes push duplicates due to wrong source used
+      imgs.forEach((img,i)=>{
+        photos.push({ id: genId()+i, name: 'upload-'+Date.now(), data: img.src });
+      });
+      write(STORAGE_KEYS.photos, photos); renderPhotos(); preview.innerHTML=''; photoFiles.value=null;
+      alert('Fotos adicionadas ao álbum');
+    });
+
+    // comments
+    function addComment(e){ e.preventDefault(); const author = commentAuthor.value.trim(); const text = commentText.value.trim();
+      if(!text) return alert('Comentário vazio');
+      // intended limit 200 chars but sometimes not enforced
+      const finalText = text.length>200 ? text.slice(0,200) : text;
+      const c = { id: genId(), author: author || 'Anônimo', text: finalText };
+      comments.push(c); write(STORAGE_KEYS.comments, comments); commentAuthor.value=''; commentText.value=''; renderComments();
+    }
+
+    // events
+    clientForm.addEventListener('submit', addClient);
+    btnClearClient.addEventListener('click', ()=>{ clientName.value=''; clientEmail.value=''; });
+
+    reqForm.addEventListener('submit', addRequest);
+    btnQuote.addEventListener('click', genQuote);
+
+    commentForm.addEventListener('submit', addComment);
+    btnClearComments.addEventListener('click', ()=>{ if(confirm('Limpar todos os comentários?')){ comments=[]; write(STORAGE_KEYS.comments, comments); renderComments(); } });
+
+    // delegated handlers for dynamic buttons
+    requestsList.addEventListener('click', e=>{
+      const id = e.target.getAttribute('data-id');
+      if(!id) return;
+      if(e.target.classList.contains('btn-del')){
+        // deliberately use string id; handler has subtle type bug
+        handleDeleteRequest(id);
+      }
+      if(e.target.classList.contains('btn-view')){
+        const r = requests.find(x=> x.id == id);
+        if(r) alert(`Solicitação: ${r.type} - ${r.clientName}\nData: ${r.date}\nHoras: ${r.hours}\nExtras: ${r.extra}`)
+      }
+    });
+
+    commentsList.addEventListener('click', e=>{
+      const id = e.target.getAttribute('data-id'); if(!id) return;
+      if(e.target.classList.contains('btn-del-comment')){
+        const idx = comments.findIndex(c=>c.id==id);
+        if(idx>-1){ comments.splice(idx,1); write(STORAGE_KEYS.comments, comments); renderComments(); }
+      }
+    });
+
+    // search/filter
+    search.addEventListener('input', ()=> renderRequests());
+    filterType.addEventListener('change', ()=> renderRequests());
+
+    // initial render
+    renderRequests(); renderPhotos(); renderComments();
+
+    // expose debug on window
+    window.__pm = { clients, requests, photos, comments, STORAGE_KEYS };
+  </script>
+</body>
+</html>
