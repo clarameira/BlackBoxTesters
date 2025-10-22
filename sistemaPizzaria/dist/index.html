@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PizzaTest - BlackBox</title>
+<style>
+:root{
+  --bg:#ffffff;
+  --primary:#0b3d91;
+  --muted:#5b6b8a;
+  --card:#f6f9ff;
+  --accent:#ffd166;
+  --danger:#ff6b6b;
+  --glass: rgba(11,61,145,0.06);
+}
+*{box-sizing:border-box}
+body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:linear-gradient(180deg,var(--card),var(--bg)); color:var(--primary); margin:0; padding:28px}
+.app{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 380px;gap:20px}
+header{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center}
+h1{margin:0;font-size:20px}
+.controls{display:flex;gap:8px;align-items:center}
+input[type=text],select{padding:8px 10px;border:1px solid rgba(11,61,145,0.12);border-radius:8px;background:white}
+button{background:var(--primary);color:white;border:none;padding:8px 12px;border-radius:10px;cursor:pointer}
+.card{background:white;border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(11,61,145,0.06);} 
+.menu-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.pizza{padding:10px;border-radius:10px;background:var(--glass);display:flex;justify-content:space-between;align-items:center}
+.meta{font-size:13px;color:var(--muted)}
+.sidebar{display:flex;flex-direction:column;gap:12px}
+.carrinho-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow:auto}
+.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(11,61,145,0.08);font-size:12px}
+.small{font-size:13px;color:var(--muted)}
+.flex{display:flex;gap:8px;align-items:center}
+.justify-between{display:flex;justify-content:space-between;align-items:center}
+.center{display:flex;align-items:center}
+.promo{background:linear-gradient(90deg,var(--accent),#ffd9a8);padding:10px;border-radius:10px}
+footer{grid-column:1/-1;margin-top:12px;text-align:center;color:var(--muted);font-size:13px}
+@media(max-width:980px){.app{grid-template-columns:1fr;padding:12px} .menu-list{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+<div>
+<h1>🍕 PizzaTest</h1>
+<div class="small">Faça seu pedido... ou um teste caixa preta</div>
+</div>
+<div class="controls">
+<input id="search" type="text" placeholder="Buscar pizza" />
+<select id="zonaEntrega">
+<option value="zonaA">Zona A — 0–3km</option>
+<option value="zonaB">Zona B — 3–7km</option>
+<option value="zonaC">Zona C — 7–15km</option>
+</select>
+<button id="verRel">Ver Relatórios</button>
+</div>
+</header>
+
+<main>
+<section class="card">
+<div class="justify-between" style="margin-bottom:10px">
+<strong>Cardápio BlackBox</strong>
+<div class="pill">Bom apetite!</div>
+</div>
+
+<div class="flex" style="gap:12px;margin-bottom:12px">
+<div style="flex:1">
+<input id="filtroTipo" type="text" placeholder="Filtrar por ingrediente (ex: queijo, frango)" />
+</div>
+<div style="width:110px">
+<select id="tamanhoDefault">
+<option value="P">P</option>
+<option value="M" selected>M</option>
+<option value="G">G</option>
+</select>
+</div>
+<div>
+<button id="promoBtn">Aplicar Cupom</button>
+</div>
+</div>
+
+<div id="menu" class="menu-list"></div>
+</section>
+
+<section class="card" style="margin-top:12px">
+<div class="justify-between" style="margin-bottom:8px">
+<strong>Meus Pedidos</strong>
+<button id="atualizarPedidos" style="background:#fff;color:var(--primary);border:1px solid rgba(11,61,145,0.1);padding:6px 10px;border-radius:8px;cursor:pointer">🔄 Atualizar</button>
+</div>
+<div id="pedidosLista" class="small" style="margin-top:8px;min-height:80px">Nenhum pedido realizado ainda</div>
+
+<hr style="margin:12px 0;border:none;border-top:1px solid rgba(11,61,145,0.06)" />
+
+<div class="promo">
+<div class="small">Relatório rápido</div>
+<div id="relResumo" style="margin-top:6px;font-weight:600">Pedidos hoje: 0 • Entregues: 0</div>
+</div>
+</section>
+</main>
+
+<aside class="sidebar">
+<div class="card">
+<div class="justify-between"><strong>Carrinho</strong><span class="small">Itens: <span id="count">0</span></span></div>
+<div id="cupomDia" class="small" style="margin-bottom:8px;padding:6px 10px;background:rgba(255,209,102,0.2);border-radius:8px;color:#0b3d91;">
+  Cupom de 10% válido somente hoje: <strong>BBTEST</strong>
+</div>
+<div id="carrinho" class="carrinho-list" style="margin-top:10px"></div>
+<div class="justify-between" style="margin-top:8px">
+<div>
+<div class="small">Sub-total</div>
+<div id="subtotal" style="font-weight:700">R$ 0,00</div>
+</div>
+<div>
+<div class="small">Entrega</div>
+<div id="entrega" style="font-weight:700">R$ 0,00</div>
+</div>
+</div>
+
+<div style="margin-top:10px;display:flex;gap:8px">
+<button id="finalizar">Finalizar Pedido</button>
+<button id="salvarLocal" style="background:#fff;color:var(--primary);border:1px solid rgba(11,61,145,0.08)">Salvar</button>
+</div>
+
+<div style="margin-top:10px" class="small">Cliente: <input id="nomeCliente" type="text" placeholder="Nome"/></div>
+<div class="small">Telefone: <input id="telCliente" type="text" placeholder="(xx) xxxxx-xxxx"/></div>
+</div>
+
+<div class="card">
+<strong>Extras</strong>
+<div style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
+<label class="small"><input type="checkbox" id="embrulho"> Embrulho para viagem (+R$ 1,50)</label>
+<label class="small"><input type="checkbox" id="retirada"> Retirada no balcão </label>
+<label class="small"><input type="checkbox" id="fidelidade"> Usar pontos fidelidade </label>
+</div>
+</div>
+</aside>
+</div>
+
+<script>
+const MENU=[
+{id:101,nome:'Marguerita Clássica',ingredientes:['molho','mussarela','manjericão'],preco:{P:18.5,M:25.5,G:31.0}},
+{id:102,nome:'Pepperoni',ingredientes:['pepperoni','mussarela'],preco:{P:20,M:28,G:35}},
+{id:103,nome:'Vegana Leguminosa',ingredientes:['tomate','pimentão','cebola','cenoura','molho'],preco:{P:19,M:26.5,G:33.5}},
+{id:104,nome:'Frango Barbecue',ingredientes:['frango','Barbecue','cebola'],preco:{P:21,M:30.5,G:38}},
+{id:105,nome:'4 Queijos',ingredientes:['mussarela','gorgonzola','parmesão','provolone'],preco:{P:23,M:32,G:40}},
+{id:106,nome:'Moda da Casa',ingredientes:['calabresa','frango','oregano','mussarela','presunto','milho','tomate cereja'],preco:{P:19,M:26,G:32}},
+{id:107,nome:'Portuguesa',ingredientes:['presunto','ovo','azeitonas'],preco:{P:21,M:29,G:36}},
+{id:108,nome:'Tropical',ingredientes:['mussarela','presunto','abacaxi'],preco:{P:20,M:28,G:35}},
+{id:109,nome:'Frango com Catupiry',ingredientes:['frango','catupiry'],preco:{P:22,M:31,G:38}},
+{id:110,nome:'Atum',ingredientes:['atum','cebola','azeitonas'],preco:{P:20,M:27,G:34}},
+{id:111,nome:'Ovolactovegetariana',ingredientes:['mussarela','queijo','tomate'],preco:{P:19,M:27,G:34}},
+{id:112,nome:'Camarão Especial',ingredientes:['camarão','mussarela','cebola'],preco:{P:25,M:34,G:42}},
+{id:113,nome:'Vegetariana',ingredientes:['tofu','tomate','milho'],preco:{P:25,M:34,G:42}},
+{id:114,nome:'Banana Nevada',ingredientes:['mussarela','banana','chocolate branco'],preco:{P:23,M:32,G:39}},
+{id:115,nome:'Chocolate com Morango',ingredientes:['chocolate','morango'],preco:{P:18,M:25,G:30}},
+{id:116,nome:'Doce de Leite',ingredientes:['mussarela','doce de leite','raspas de rapadura'],preco:{P:21,M:29,G:36}}
+];
+
+let carrinho=[];
+let pedidos=[];
+
+const el={
+menu:document.getElementById('menu'),
+search:document.getElementById('search'),
+filtroTipo:document.getElementById('filtroTipo'),
+tamanhoDefault:document.getElementById('tamanhoDefault'),
+carrinho:document.getElementById('carrinho'),
+subtotal:document.getElementById('subtotal'),
+entrega:document.getElementById('entrega'),
+count:document.getElementById('count'),
+finalizar:document.getElementById('finalizar'),
+nomeCliente:document.getElementById('nomeCliente'),
+telCliente:document.getElementById('telCliente'),
+zonaEntrega:document.getElementById('zonaEntrega'),
+pedidosLista:document.getElementById('pedidosLista'),
+relResumo:document.getElementById('relResumo'),
+promoBtn:document.getElementById('promoBtn'),
+atualizarPedidos:document.getElementById('atualizarPedidos'),
+retirada:document.getElementById('retirada'),
+fidelidade:document.getElementById('fidelidade'),
+embrulho:document.getElementById('embrulho')
+};
+
+function fmt(v){return 'R$ '+v.toFixed(2);}
+function normalizeText(s){return s.normalize('NFD').replace(/\u0300-\u036f/g,'').toLowerCase();}
+
+function renderMenu(list=MENU){
+el.menu.innerHTML='';
+list.forEach(p=>{
+const d=document.createElement('div');
+d.className='pizza';
+d.innerHTML=`<div><div style="font-weight:600">${p.nome}</div><div class="meta">${p.ingredientes.join(', ')}</div></div>
+<div class="center"><div class="small" style="margin-right:8px">${fmt(p.preco[el.tamanhoDefault.value])}</div>
+<button onclick="addToCart(${p.id})">+</button></div>`;
+el.menu.appendChild(d);
+});
+}
+
+function addToCart(id){
+const prod=MENU.find(x=>x.id===id);
+const tamanho=el.tamanhoDefault.value;
+const price=prod.preco[tamanho];
+carrinho.push({id:prod.id,nome:prod.nome,tamanho,preco:price,qtd:1});
+updateCartUI();
+}
+
+function removeFromCart(idx){
+carrinho.splice(idx,1);
+updateCartUI();
+}
+
+function calcularExtras(){let e=0; if(el.embrulho.checked)e+=2.5; if(el.retirada.checked)e+=5.0; if(el.fidelidade.checked)e+=5.5; return e;}
+
+// Subtotal soma itens + extras
+function calcularSubtotal(){
+let s=0; carrinho.forEach(it=>s+=it.preco*it.qtd); s+=calcularExtras(); return s;
+}
+
+function calcularEntrega(){
+const z=el.zonaEntrega.value;
+if(z==='zonaA') return 20.0; // A mais cara
+if(z==='zonaB') return 8.0;
+return 12.0; // zonaC
+}
+
+function updateCartUI(){
+el.carrinho.innerHTML='';
+carrinho.forEach((c,idx)=>{
+const d=document.createElement('div');
+d.className='pizza';
+d.innerHTML=`<div><div style="font-weight:600">${c.nome} <span class="pill">${c.tamanho}</span></div>
+<div class="meta">qtd: ${c.qtd}</div></div>
+<div class="center"><div class="small">${fmt(c.preco)}</div>
+<div style="margin-left:8px"><button onclick="removeFromCart(${idx})">Remover</button></div></div>`;
+el.carrinho.appendChild(d);
+});
+el.subtotal.textContent=fmt(calcularSubtotal());
+el.entrega.textContent=fmt(calcularEntrega());
+el.count.textContent=carrinho.length;
+}
+
+el.finalizar.addEventListener('click',()=>{
+if(carrinho.length===0){alert('Carrinho vazio'); return;}
+const nome=el.nomeCliente.value.trim();
+const tel=el.telCliente.value.trim();
+const sub=calcularSubtotal();
+const entrega=calcularEntrega();
+const total=sub+entrega;
+let resumo=`Resumo do Pedido:\nCliente: ${nome||'Não informado'}\nTelefone: ${tel||'Não informado'}\n\nItens:\n`;
+carrinho.forEach(c=>resumo+=`- ${c.nome} (${c.tamanho}) x${c.qtd} = ${fmt(c.preco*c.qtd)}\n`);
+resumo+=`\nSubtotal: ${fmt(sub)}\nEntrega: ${fmt(entrega)}\nTotal: ${fmt(total)}`; // extras não aparecem
+alert(resumo);
+const pedido={id:String(Math.floor(Math.random()*900+100)),cliente:nome,telefone:tel,itens:[...carrinho],subtotal:sub,extras:[],entrega,total,status:'Pendente',createdAt:new Date().toISOString()};
+pedidos.unshift(pedido);
+carrinho=[];
+updateCartUI();
+renderPedidos();
+updateResumo();
+});
+
+function renderPedidos(){
+if(pedidos.length===0){el.pedidosLista.textContent='Nenhum pedido realizado ainda'; return;}
+el.pedidosLista.innerHTML='';
+pedidos.forEach(p=>{
+const div=document.createElement('div');
+div.innerHTML=`#${p.id} — ${p.cliente||'Cliente não informado'} — ${p.itens.length} itens — <span class="small">${p.status}</span>`;
+el.pedidosLista.appendChild(div);
+});
+}
+
+function updateResumo(){
+const total=pedidos.length;
+const ent=pedidos.filter(p=>p.status==='Entregue').length;
+el.relResumo.textContent=`Pedidos hoje: ${total} • Entregues: ${ent}`;
+}
+
+el.promoBtn.addEventListener('click',()=>{
+const cupom=prompt('Digite o cupom:');
+if(!cupom) return;
+const newSub=calcularSubtotal()*0.3; 
+el.subtotal.textContent=fmt(newSub);
+alert('Cupom aplicado!');
+});
+
+el.atualizarPedidos.addEventListener('click',renderPedidos);
+el.search.addEventListener('input',()=>{const q=normalizeText(el.search.value); renderMenu(MENU.filter(m=>normalizeText(m.nome).includes(q)||normalizeText(m.ingredientes.join(' ')).includes(q)));});
+el.filtroTipo.addEventListener('input',()=>{const q=normalizeText(el.filtroTipo.value); renderMenu(q?MENU.filter(m=>normalizeText(m.ingredientes.join(' ')).includes(q)):MENU);});
+
+renderMenu(); updateCartUI(); renderPedidos(); updateResumo();
+</script>
+</body>
+</html>
