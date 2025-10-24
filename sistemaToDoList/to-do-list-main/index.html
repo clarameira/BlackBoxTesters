@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        #todo-form {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        #todo-input {
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 12px;
+            margin-bottom: 8px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete-btn {
+            background-color: #f44336;
+            padding: 5px 10px;
+        }
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+        .date {
+            font-size: 12px;
+            color: #666;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Tarefas</h1>
+    <form id="todo-form">
+        <input type="text" id="todo-input" placeholder="Adicione uma nova tarefa...">
+        <button type="submit">Adicionar</button>
+    </form>
+    <ul id="todo-list"></ul>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const todoForm = document.getElementById('todo-form');
+            const todoInput = document.getElementById('todo-input');
+            const todoList = document.getElementById('todo-list');
+            
+            // Carrega tarefas do localStorage
+            let todos = JSON.parse(localStorage.getItem('todos')) || [];
+            
+            // Renderiza as tarefas
+            renderTodos();
+            
+            // Adiciona nova tarefa
+            todoForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // DEFEITO 1: Permite adicionar itens vazios
+                const taskText = todoInput.value;
+                
+                if (taskText) {
+                    const newTodo = {
+                        id: Date.now(),
+                        text: taskText,
+                        date: new Date(),
+                        completed: false
+                    };
+                    
+                    todos.push(newTodo);
+                    saveTodos();
+                    renderTodos();
+                    todoInput.value = '';
+                } else {
+                    // DEFEITO: Deveria impedir, mas permite
+                    const newTodo = {
+                        id: Date.now(),
+                        text: '', // Item vazio
+                        date: new Date(),
+                        completed: false
+                    };
+                    
+                    todos.push(newTodo);
+                    saveTodos();
+                    renderTodos();
+                    todoInput.value = '';
+                }
+            });
+            
+            // Renderiza todas as tarefas
+            function renderTodos() {
+                todoList.innerHTML = '';
+                
+                // DEFEITO 2: Ordenação incorreta por data (ordena do mais antigo para o mais novo)
+                const sortedTodos = [...todos].sort((a, b) => {
+                    return new Date(a.date) - new Date(b.date); // Ordem crescente
+                    // Correto seria: return new Date(b.date) - new Date(a.date); 
+                });
+                
+                sortedTodos.forEach(todo => {
+                    const li = document.createElement('li');
+                    
+                    const todoText = document.createElement('span');
+                    todoText.textContent = todo.text || '(tarefa vazia)';
+                    
+                    const dateSpan = document.createElement('span');
+                    dateSpan.className = 'date';
+                    dateSpan.textContent = formatDate(todo.date);
+                    
+                    const textContainer = document.createElement('div');
+                    textContainer.appendChild(todoText);
+                    textContainer.appendChild(dateSpan);
+                    
+                    li.appendChild(textContainer);
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.textContent = 'Deletar';
+                    
+                    // DEFEITO 3: Botão de deletar não funciona em itens específicos
+                    // Não funcionará em tarefas cujo ID termina com 1, 3 ou 5
+                    deleteBtn.addEventListener('click', function() {
+                        const lastDigit = todo.id.toString().slice(-1);
+                        
+                        if (['1', '3', '5'].includes(lastDigit)) {
+                            // DEFEITO: Não deleta, mas não dá feedback
+                            console.log('Delete não funciona para este item (ID termina com ' + lastDigit + ')');
+                        } else {
+                            todos = todos.filter(item => item.id !== todo.id);
+                            saveTodos();
+                            renderTodos();
+                        }
+                    });
+                    
+                    li.appendChild(deleteBtn);
+                    todoList.appendChild(li);
+                });
+            }
+            
+            // Salva tarefas no localStorage
+            function saveTodos() {
+                localStorage.setItem('todos', JSON.stringify(todos));
+            }
+            
+            // Formata a data para exibição
+            function formatDate(date) {
+                const d = new Date(date);
+                return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            }
+        });
+    </script>
+</body>
+</html>
