@@ -65,16 +65,8 @@ Este estudo busca somar como um recurso didático, no idioma português, e, a pa
 
 ## 📜 Comitê de Ética
 
-Parecer Consubstanciado aprovado pelo Comitê de Ética em Pesquisa. Número: 7.236.121.
+Parecer Consubstanciado aprovado pelo Comitê de Ética em Pesquisa. Número: [Removido para Revisão].
 
-
-## 🤝 Colaboradores
-
-- [Maria Clara](https://github.com/clarameira)
-- [Maria Alice](https://github.com/Malicef)
-- [Geísa Morais](https://github.com/Geisa-mg)
-- [Alysson Milanez](https://github.com/alyssonfm)
-- [David Candeia](https://github.com/davidcmm)
 
 ## 🔗 Links
 
