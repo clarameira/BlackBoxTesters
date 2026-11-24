@@ -33,17 +33,7 @@ Este estudo busca somar como um recurso didático, no idioma português, e, a pa
 
 
 ## ✨ Sistemas a serem testados
-
-- [Sistema Acervo](https://sabv-app.onrender.com/admin/login)
-- [Sistema Biblioteca Digital](https://clarameira.github.io/praticeBlackBox/)
-- [Sistema de Cursos Online](https://clarameira.github.io/UsabilityCourse/)
-- [Sistema Farmácia](https://clarameira.github.io/farmaciaTest/)
-- [Sistema de Preenchimento de Formulário](https://clarameira.github.io/DynamicTestCourse/)
-- [Sistema Fotografia](https://clarameira.github.io/phototest/)
-- [Sistema Pizzaria](https://clarameira.github.io/pizzariaTest/)
-- [Sistema de Reprodução de Áudio](https://malicef.github.io/exemplos_de_teste/)
-- [Sistema ToDoList](https://malicef.github.io/to-do-list/) 
-
+[Links Removidos para Revisão]
 <!-- ### Sistema Acervo
 
 ### Sistema Biblioteca Digital
@@ -66,12 +56,6 @@ Este estudo busca somar como um recurso didático, no idioma português, e, a pa
 ## 📜 Comitê de Ética
 
 Parecer Consubstanciado aprovado pelo Comitê de Ética em Pesquisa. Número: [Removido para Revisão].
-
-
-## 🔗 Links
-
-* [Site](https://clarameira.github.io/BlackBoxTesters/)
-* [Formulário](https://clarameira.github.io/BlackBoxTesters/)
 
 
 
